@@ -1,0 +1,39 @@
+﻿Wymuszenia: 
+	Ilość par obrotowych
+		
+Numer pary obrotowej 
+		Numer funkcji odpowiadającej danej parze
+		
+Ilość par postępowych
+		
+Numer pary postępowej 
+		Numer funkcji odpowiadającej danej parze
+
+
+Pary
+		
+Liczba par obrotowych
+		
+Numer pierwszego członu 
+		Numer Drugiego członu 
+		Współrzędna X  pary obrotowej
+		Współrzędna Y pary obrotowej
+		
+Liczba par postępowych
+		
+Numer pierwszego członu 
+		Numer Drugiego czlonu 
+		Współrzędna X przyłożenia pary do pierwszego członu 
+		Współrzędna Y przyłożenia pary do pierwszego członu 		
+		Współrzędna X przyłożenia pary do drugiego członu
+		Współrzędna Y przyłożenia pary do drugiego członu
+
+
+Człony
+		
+		Liczba członów
+		
+Współrzędna X
+		Współrzędna Y
+		Kąt fi
+		
