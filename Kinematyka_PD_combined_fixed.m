@@ -227,7 +227,7 @@ function [DDQ] = Przyspieszenie(DQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, Wym
         [~,Dfi1,~]= Polozenia(DQ_TEMP,P1);
         [~,DFi2,~]= Polozenia(DQ_TEMP,P2);
         
-        %Wzór 2.40 ze skryptu
+        %Wzór 2.42 ze skryptu
         Gamma(Pozycja:Pozycja+1, 1) = Rot1 * sA * Dfi1^2 - Rot2 * sB * DFi2^2;
     
         Pozycja = Pozycja + 2;
@@ -235,7 +235,7 @@ function [DDQ] = Przyspieszenie(DQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, Wym
     
     %Pary postępowe
     for i=1:size(ParyPostepowe,1) 
-        %Wzór 2.46 ze skryptu        
+        %Wzór 2.48 ze skryptu        
         Gamma(Pozycja, 1) = 0;
         Pozycja = Pozycja + 1;
 
@@ -252,7 +252,7 @@ function [DDQ] = Przyspieszenie(DQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, Wym
         [DR1,Dfi1,~] = Polozenia(DQ_TEMP,P1);
         [DR2,DFi2,~] = Polozenia(DQ_TEMP,P2);
 
-        %Wzór 2.57 ze skryptu
+        %Wzór 2.59 ze skryptu
         Gamma(Pozycja, 1) = (Rot2 * V)'*(2 * Om * (DR2 - DR1) * DFi2 + (R2 - R1) * DFi2^2 - Rot1 * sA * (DFi2 - Dfi1)^2 ); 
 
         Pozycja = Pozycja + 1;
@@ -273,7 +273,7 @@ function [DDQ] = Przyspieszenie(DQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, Wym
         [DR1,Dfi1,~]=Polozenia(DQ_TEMP,P1);
         [DR2,DFi2,~]=Polozenia(DQ_TEMP,P2);
 
-        %Wzór 2.57 ze skryptu
+        %Wzór 2.59 ze skryptu
         Gamma(Pozycja, 1) = (Rot2 * U)'*(2 * Om * (DR2 - DR1) * DFi2 + (R2 - R1) * DFi2^2 - Rot1 * sA * (DFi2 - Dfi1)^2 ) +WymuszenieP(WymPostepowe(i, 2), 2, T_TEMP,ParyPostepowe, WymPostepowe); 
 
         Pozycja = Pozycja + 1;
@@ -303,7 +303,7 @@ function F = Wiezy(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe, T_TEMP)
         sA = ParyObrotowe(i,3:4)';
         sB = ParyObrotowe(i,5:6)';
  
-        %Wzór 2.16 w skrypcie z wykładu
+        %Wzór 2.18 w skrypcie z wykładu
         F(Pozycja:Pozycja+1,1) = R1 + Rot1 * sA - (R2 + Rot2 * sB);
         
         Pozycja = Pozycja + 2;
@@ -320,10 +320,10 @@ function F = Wiezy(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe, T_TEMP)
         U = ParyPostepowe(i,4:5)';
         V = [-U(2); U(1)];
 
-        %Wzór 2.17
+        %Wzór 2.19
         F(Pozycja,1) = Fi1 - Fi2 - Fi0;
         
-        %Wzór 2.20
+        %Wzór 2.22
         F(Pozycja+1,1) = (Rot2 * V)'*(R2 - R1 - Rot1 * sA) + V' * sB;
         
         Pozycja = Pozycja + 2;
@@ -340,7 +340,7 @@ function F = Wiezy(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe, T_TEMP)
         sA = ParyPostepowe(WymPostepowe(i,1),6:7)';
         sB = ParyPostepowe(WymPostepowe(i,1),8:9)';
         
-        % wzor 2.26 na wymuszenie w parze postepowej
+        % wzor 2.28 na wymuszenie w parze postepowej
         F(Pozycja,1) = (Rot2 * U)'*(R2 + Rot2 * sB - R1 - Rot1 * sA) - WymuszenieP(WymPostepowe(i,2),0,T_TEMP,ParyPostepowe, WymPostepowe);
         
         Pozycja = Pozycja + 1;
@@ -349,7 +349,7 @@ end
 %% jakobian
 
 function [FQ] = Jakobian(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe)
-    %Funkcja wyznaczaj¹ca Jakobian równañ wiêzów 
+    %Funkcja wyznaczająca Jakobian równań więzów 
     
     Om = [0 -1; 1 0];
     FQ = zeros(length(Q_TEMP),length(Q_TEMP));
@@ -362,21 +362,21 @@ function [FQ] = Jakobian(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe)
         [~,~,Rot1] = Polozenia(Q_TEMP,ParyObrotowe(i,1));
         [~,~,Rot2] = Polozenia(Q_TEMP,ParyObrotowe(i,2));
         
-        %Je¿eli dany cz³on nie jest podstaw¹
+        %Jeżeli dany człon nie jest podstawą
         if ParyObrotowe(i,1) ~= 0 
-            %Wzór 2.29 ze skryptu
+            %Wzór 2.31 ze skryptu
             FQ(Pozycja:Pozycja+1, ParyObrotowe(i,1)*3-2:ParyObrotowe(i,1)*3-1) = eye(2);
             
-            %Wzór 2.30 ze skryptu
+            %Wzór 2.32 ze skryptu
             FQ(Pozycja:Pozycja+1,ParyObrotowe(i,1)*3) = Om * Rot1 * sA; 
         end
         
-        %Je¿eli dany cz³on nie jest podstaw¹
+        %Jeżeli dany człon nie jest podstawą
         if ParyObrotowe(i,2) ~= 0
-            %Wzór 2.31 ze skryptu
+            %Wzór 2.33 ze skryptu
             FQ(Pozycja:Pozycja+1, ParyObrotowe(i,2)*3-2:ParyObrotowe(i,2)*3-1) = -eye(2); 
             
-            %Wzór 2.32 ze skryptu
+            %Wzór 2.34 ze skryptu
             FQ(Pozycja:Pozycja+1, ParyObrotowe(i,2)*3) = -Om * Rot2 * sB; 
         end
     
@@ -392,27 +392,27 @@ function [FQ] = Jakobian(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe)
         [R1,~,Rot1] = Polozenia(Q_TEMP,ParyPostepowe(i,1));
         [R2,~,Rot2] = Polozenia(Q_TEMP,ParyPostepowe(i,2));
         
-        %Je¿eli dany cz³on nie jest podstaw¹
+        %Jeżeli dany człon nie jest podstawą
         if ParyPostepowe(i,1) ~= 0
-            %Wzór 2.42 ze skryptu
+            %Wzór 2.44 ze skryptu
             FQ(Pozycja, ParyPostepowe(i,1)*3) = 1; 
             
-            %Wzór 2.47 ze skryptu
+            %Wzór 2.49 ze skryptu
             FQ(Pozycja+1, ParyPostepowe(i,1)*3-2:ParyPostepowe(i,1)*3-1) = -(Rot2 * V)'; 
             
-            %Wzór 2.48 ze skryptu
+            %Wzór 2.50 ze skryptu
             FQ(Pozycja+1, ParyPostepowe(i,1)*3) = -(Rot2 * V)' * Om * Rot1 * sA; 
         end
         
-        %Je¿eli cz³on nie jest podstaw¹
+        %Jeżeli człon nie jest podstawą
         if ParyPostepowe(i,2) ~= 0
-            %Wzór 2.44 ze skryptu
+            %Wzór 2.46 ze skryptu
             FQ(Pozycja, ParyPostepowe(i,2)*3) = -1; 
             
-            %Wzór 2.49 ze skryptu
+            %Wzór 2.51 ze skryptu
             FQ(Pozycja+1, ParyPostepowe(i,2)*3-2:ParyPostepowe(i,2)*3-1) = (Rot2 * V)'; 
             
-            %Wzór 2.50 ze skryptu
+            %Wzór 2.52 ze skryptu
             FQ(Pozycja+1, ParyPostepowe(i,2)*3) = -(Rot2 * V)' * Om * (R2 - R1 - Rot1 * sA); 
         end
    
@@ -430,21 +430,21 @@ function [FQ] = Jakobian(Q_TEMP, ParyObrotowe, ParyPostepowe, ~, WymPostepowe)
         [R1,~,Rot1] = Polozenia(Q_TEMP,ParyPostepowe(WymPostepowe(i,1),1));
         [R2,~,Rot2] = Polozenia(Q_TEMP,ParyPostepowe(WymPostepowe(i,1),2));
         
-        %Je¿eli cz³on nie jest podstaw¹
+        %Je¿eli człon nie jest podstawą
         if ParyPostepowe(WymPostepowe(i,1),1) ~= 0
-            %Wzór 2.47 ze skryptu
+            %Wzór 2.49 ze skryptu
             FQ(Pozycja, ParyPostepowe(WymPostepowe(i,1),1)*3-2:ParyPostepowe(WymPostepowe(i,1),1)*3-1) = -(Rot2 * U)'; 
             
-            %Wzór 2.48 ze skryptu
+            %Wzór 2.50 ze skryptu
             FQ(Pozycja, ParyPostepowe(WymPostepowe(i,1),1)*3) = -(Rot2 * U)' * Om * Rot1 * sA; % 
         end
         
-        %Je¿eli cz³on nie jest podstaw¹
+        %Jeżeli człon nie jest podstawą
         if ParyPostepowe(WymPostepowe(i,1),2) ~= 0
-            %Wzór 2.49 ze skryptu
+            %Wzór 2.51 ze skryptu
             FQ(Pozycja, ParyPostepowe(WymPostepowe(i,1),2)*3-2:ParyPostepowe(WymPostepowe(i,1),2)*3-1) = (Rot2 * U)'; 
             
-            %Wzór 2.50 ze skryptu
+            %Wzór 2.52 ze skryptu
             FQ(Pozycja, ParyPostepowe(WymPostepowe(i,1),2)*3) = -(Rot2 * U)' * Om * (R2 - R1 - Rot1 * sA); 
         end
         Pozycja = Pozycja + 1;
