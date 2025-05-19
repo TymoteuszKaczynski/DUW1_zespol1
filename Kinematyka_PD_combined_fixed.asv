@@ -65,7 +65,7 @@ for i=3:3:30
     figure();
     plot(T, D2Q(i-2, :))
     xlabel('Czas [s]')
-    ylabel(sprintf('Przyspieszenie X członu c%d [m/s^2]', i/3));
+    ylabel(sprintf('Prę X członu c%d [m/s]', i/3));
     title(sprintf('Przyspieszenie X członu c%d w czasie', i/3));
     grid on
     gcf;
