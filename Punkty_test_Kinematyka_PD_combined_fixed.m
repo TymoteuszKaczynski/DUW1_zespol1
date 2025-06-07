@@ -1,116 +1,30 @@
 %START.m
-fprintf('Krok czasowy:\n')
+%fprintf('Krok czasowy:\n')
 dT = 0.1; %input("Wpisz dt:\n");
-fprintf('Czas symulacji [s]:\n')
+%fprintf('Czas symulacji [s]:\n')
 T_Max = 30; %input("Wpisz t maksymalne:\n")
 
-[T,Q, DQ, D2Q,pQ, pDQ, pD2Q] = Main(dT,T_Max);
+[T,Q, DQ, D2Q] = Main(dT,T_Max);
+[Czlony,Punkty,~,~,~,~]=Dane();
+[pq,pdq,pd2q] = PunktPolozenie(Punkty,Czlony,Q,DQ,D2Q,10,9); %(~,~,~,~,~,nr_czlonu,nr_punktu)
+%[czlon,punkt]
+%[1,1]-punkt D
+%[1,2]-punkt F
+%[1,3]-punkt G
+%[2,4]-punkt H
+%[8,5]-punkt J
+%[8,6]-punkt J
+%[8,7]-punkt K
+%[10,8]-punkt L
+%[10,9]-punkt M
+%[10,10]-punkt D
+
+%pq,pdq,pd2q - 1-x,2-y
 figure()
-plot(T,pD2Q(25,:))
+plot(T,pq(1,:))
 xlabel('Czas symulacji [s]')
 ylabel('Położenie x punktu M [m]')
 grid on
-
-%punkty
-%D[1,2,3]
-%F[4,5,6]
-%G[7,8,9]
-%H[10,11,12]
-%I[13,14,15]
-%J[16,17,18]
-%K[19,20,21]
-%L[22,23,24]
-%M[25,26,27]
-%N[28,29,30]
-%{
-for i=3:3:30
-    figure();
-    plot(T, Q(i-2, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Położenie X członu c%d [m]', i/3));
-    title(sprintf('Położenie X członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/Pol_x/Polozenie_x_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, Q(i-1, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Położenie Y członu c%d [m]', i/3));
-    title(sprintf('Położenie Y członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/Pol_y/Polozenie_Y_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, Q(i, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Kąt fi członu c%d [rad]', i/3));
-    title(sprintf('Kąt fi członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/Pol_fi/Polozenie_fi_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    figure();
-    plot(T, DQ(i-2, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Prędkość X członu c%d [m/s]', i/3));
-    title(sprintf('Prędkość X członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/V_x/V_x_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, DQ(i-1, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Prędkość Y członu c%d [m/s]', i/3));
-    title(sprintf('Prędkość Y członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/V_y/V_Y_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, DQ(i, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Prędkość kątowa członu c%d [rad/s]', i/3));
-    title(sprintf('Prędkość kątowa członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/V_fi/V_fi_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    figure();
-    plot(T, D2Q(i-2, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Przyspieszenie X członu c%d [m/s^2]', i/3));
-    title(sprintf('Przyspieszenie X członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/a_x/a_x_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, D2Q(i-1, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Przyspieszenie Y członu c%d [m/s^2]', i/3));
-    title(sprintf('Przyspieszenie Y członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/a_y/a_Y_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    figure();
-    plot(T, D2Q(i, :))
-    xlabel('Czas [s]')
-    ylabel(sprintf('Przyspieszenie kątowe członu c%d [rad/s^2]', i/3));
-    title(sprintf('Przyspieszenie kątowe członu c%d w czasie', i/3));
-    grid on
-    gcf;
-    filename = sprintf('Wyniki/a_fi/a_fi_%d.png', i/3);
-    exportgraphics(gcf,filename)
-    end
-%}
-
-
 
 function R = Rot(fi)
 %Funkcja obliczająca macierz rotacji2D
@@ -118,9 +32,9 @@ R = [cos(fi) -sin(fi); sin(fi) cos(fi)];
 end
 
 %Main.m
-function [T,Q, DQ, D2Q,pQ, pDQ, pD2Q] = Main(dT,T_Max)   
+function [T,Q, DQ, D2Q] = Main(dT,T_Max)   
     %Wczytanie parametrów z plików
-    [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe] = Dane();
+    [Czlony, ~, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe] = Dane();
     
     %Wyznaczenie liczby wyników i zadeklarowanie licznika 
     IleIteracji = 1;
@@ -128,20 +42,14 @@ function [T,Q, DQ, D2Q,pQ, pDQ, pD2Q] = Main(dT,T_Max)
 
     % Przybliżenie startowe  
     Q_TEMP = Czlony;
-    pQ_TEMP=pQ_fun(Q_TEMP,delta(Czlony,Punkty),Punkty);
     DQ_TEMP = zeros(length(Q_TEMP),1);
-    %pDQ_TEMP=zeros(length(pQ_TEMP),1);
     D2Q_TEMP = zeros(length(Q_TEMP),1);
-    %pD2Q_TEMP = zeros(length(pQ_TEMP),1);
     
     %Zadeklarowanie rozmiaru macierzy i wektorów gromadzących wyniki
     T = zeros(1, Size);
     Q = zeros(length(Q_TEMP), Size);
-    pQ = zeros(length(Q_TEMP), Size);
     DQ = zeros(length(Q_TEMP), Size);
-    pDQ = zeros(length(Q_TEMP), Size);
     D2Q = zeros(length(Q_TEMP), Size);
-    pD2Q = zeros(length(Q_TEMP), Size);
 
     %Rozwiązywanie zadań kinematyki w kolejnych chwilach T_TEMP
     for T_TEMP = 0:dT:T_Max
@@ -149,21 +57,15 @@ function [T,Q, DQ, D2Q,pQ, pDQ, pD2Q] = Main(dT,T_Max)
         
         %Rozwiązanie zadania o położenie
         Q_TEMP=NewRaph(Q_TEMP, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe, T_TEMP);
-        pQ_TEMP=pQ_fun(Q_TEMP,delta(Czlony,Punkty),Punkty);
         %Rozwiązanie zadania o prędkości
         DQ_TEMP=Predkosc(Q_TEMP, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe,T_TEMP);
-        pDQ_TEMP=Predkosc(pQ_TEMP, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe,T_TEMP);
         %Rozwiązanie zadania o przyśpieszenia 
         D2Q_TEMP=Przyspieszenie(DQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe,T_TEMP);
-        pD2Q_TEMP=Przyspieszenie(pDQ_TEMP,Q_TEMP, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe,T_TEMP);
         %Zapisane wyników do macierzy i wektorów gromadzących
         T(1,IleIteracji) = T_TEMP; 
         Q(:,IleIteracji) = Q_TEMP;
         DQ(:,IleIteracji) = DQ_TEMP;
         D2Q(:,IleIteracji) = D2Q_TEMP;
-        pQ(:,IleIteracji) = pQ_TEMP;
-        pDQ(:,IleIteracji) = pDQ_TEMP;
-        pD2Q(:,IleIteracji) = pD2Q_TEMP;
         IleIteracji = IleIteracji + 1;
     end
     %%
@@ -200,7 +102,7 @@ end
 
 
 %Dane.m
-function [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe] = Dane()
+function [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe,Masy,Sily,Sprezyto_tlumiace] = Dane()
 %%
     %Funkcja wczytująca parametry z plików 
     c = fopen('Dane/Człony.txt', 'r');
@@ -209,27 +111,27 @@ function [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe
     po=fopen('Dane/Punkty.txt','r');
     
     %Wczytanie ilości członów
-    no = str2num(fgetl(c));  % wczytanie liczby członów
-    for i = 1:no
+    no_cz = str2num(fgetl(c));  % wczytanie liczby członów
+    for i = 1:no_cz
         Czlony(3*(i-1)+1:3*i) = str2num(fgetl(c));  %wczytanie poszczególnych członów do macierzy członów [x,y,fi]
     end
-    fprintf('Czlony:\n')
+    %fprintf('Czlony:\n')
     %disp(Czlony)
     Czlony = Czlony'; %macierz 3 x no
 
     %wczytanie punktów
-     no = str2num(fgetl(po));  % wczytanie liczby członów
-    for i = 1:no
+     no_po = str2num(fgetl(po));  % wczytanie liczby członów
+    for i = 1:no_po
         Punkty(4*(i-1)+1:4*i) = str2num(fgetl(po));  %wczytanie poszczególnych członów do macierzy członów [x,y,fi]
     end
-    fprintf('Punkty:\n')
+    %fprintf('Punkty:\n')
     %disp(Punkty)
     Punkty = Punkty'; %macierz 3 x no
     %%
     %Wczytanie par obrotowych
-    no = str2num(fgetl(p));     %liczba par obrotowych
-    ParyObrotowe = zeros(no, 6); %stworzenie pustej początkowej macierzy przechowywującej pary obrotowe
-    for i = 1:no %przepisanie wartości z pliku wsadowego do kompilatora
+    no_rev = str2num(fgetl(p));     %liczba par obrotowych
+    ParyObrotowe = zeros(no_rev, 6); %stworzenie pustej początkowej macierzy przechowywującej pary obrotowe
+    for i = 1:no_rev %przepisanie wartości z pliku wsadowego do kompilatora
         tmp = str2num(fgetl(p));
         Czlon1 = tmp(1); Czlon2 = tmp(2);
         Polozenie = [tmp(3); tmp(4)];
@@ -254,12 +156,12 @@ function [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe
         ParyObrotowe(i,5:6) = R2'*(Polozenie-q2);
         
     end
-    fprintf('Pary obrotowe\n')
+    %fprintf('Pary obrotowe\n')
     %disp(ParyObrotowe)
     %Wczytanie par postępowych - analogiczne do par obrotowych
-    no = str2num(fgetl(p));
-    ParyPostepowe = zeros(no,13);
-    for i = 1:no
+    no_pp = str2num(fgetl(p));
+    ParyPostepowe = zeros(no_pp,13);
+    for i = 1:no_pp
         tmp = str2num(fgetl(p));
         Czlon1 = tmp(1); Czlon2 = tmp(2);
         Polozenie1 = [tmp(3); tmp(4)];
@@ -288,25 +190,27 @@ function [Czlony, Punkty, ParyObrotowe, ParyPostepowe, WymObrotowe, WymPostepowe
     U = R2'*U;
     ParyPostepowe(i,4:5) = U';
     end
-    fprintf('Pary Postępowe:\n')
+    %fprintf('Pary Postępowe:\n')
     %disp(ParyPostepowe)
     %Wczytanie wymuszen obrotowych 
-    no = str2num(fgetl(w));
-    WymObrotowe = zeros(no,2);
-    for i  = 1:no
+    no_wymo = str2num(fgetl(w));
+    WymObrotowe = zeros(no_wymo,2);
+    for i  = 1:no_wymo
         WymObrotowe(i,:) = str2num(fgetl(w));
     end
     %Wczytanie wymuszen postepowych 
-    no = str2num(fgetl(w));
+    no_wymp = str2num(fgetl(w));
 
 
-    WymPostepowe = zeros(no,6);
-    for i  = 1:no
+    WymPostepowe = zeros(no_wymp,6);
+    for i  = 1:no_wymp
         WymPostepowe(i,:) = str2num(fgetl(w));
         
     end
-    fprintf('Wymuszenia postępowe:\n')
+    %fprintf('Wymuszenia postępowe:\n')
     %disp(WymPostepowe)
+    % Macierz masowa
+
     fclose(c);
     fclose(p);
     fclose(w);
@@ -614,16 +518,30 @@ function delta = delta(Czlony,Punkty)
     end
     %%
 end
-function pQ = pQ_fun(Q_TEMP,delta,Punkty)
+function [pq,pdq,pd2q] = PunktPolozenie(Punkty,Czlony,Q,dQ,d2Q,nr_czlonu,nr_punktu)
 %%
-        %delta=delta();
-        %[~,Punkty,~,~,~,~]=Dane();
-        %Q_TEMP=Czlony;
-        Punkty=Punkty(:);
-        temp=Punkty(1:4:end);
-        for i=1:length(temp)
-            pQ(3*(i-1)+1:3*i)=[Q_TEMP(3*temp(i)-2)+delta(3*i-2);Q_TEMP(3*temp(i)-1)+delta(3*i-1);Q_TEMP(3*temp(i))+delta(3*i);];
-        end
-        pQ=pQ';
-%%
+omega = [0 -1; 1 0];
+    Punkty=Punkty(:);
+    temp=Punkty(1:4:end);
+    delta=zeros(length(Punkty)*3/4,1);
+    for i=1:length(temp)
+        delta(3*(i-1)+1:3*i)=[Punkty(4*i-2)-Czlony(3*temp(i)-2);Punkty(4*i-1)-Czlony(3*temp(i)-1);Punkty(4*i)-Czlony(3*temp(i))];
+    end
+pq=Q(3*nr_czlonu-2:3*nr_czlonu-1,:);
+S_A=[delta(3*nr_punktu-2);delta(3*nr_punktu-1)];
+%położenie
+    for i=1:length(pq)
+    pq(:,i)=pq(:,i)+Rot(Q(3*nr_czlonu,i))*S_A;
+    end
+%prędkość
+    pdq=dQ(3*nr_czlonu-2:3*nr_czlonu-1,:);
+for i=1:length(pdq)
+    pdq(:,i)=pdq(:,i)+(omega*Rot(Q(3*nr_czlonu,i))*S_A*dQ(3*nr_czlonu,i));
 end
+%przyspieszenie
+pd2q=d2Q(3*nr_czlonu-2:3*nr_czlonu-1,:);
+for i=1:length(pd2q)
+    pd2q(:,i)=pd2q(:,i)+(omega*Rot(Q(3*nr_czlonu,i))*S_A*d2Q(3*nr_czlonu,i))-(Rot(Q(3*nr_czlonu,i))*S_A*dQ(3*nr_czlonu,i)^2);
+end
+end
+%%
