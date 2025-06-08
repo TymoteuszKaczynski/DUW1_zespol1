@@ -270,10 +270,6 @@ for i=1:length(dq)
     dq(:,i)=dq(:,i)+(omega*Rot(Q(3*nr_czlonu,i))*S_A*d2Q(3*nr_czlonu,i))-(Rot(Q(3*nr_czlonu,i))*S_A*dQ(3*nr_czlonu,i)^2);
 end
 end
-function R = Rot(fi)
-%Macierz rotacji dla przypadku 2D - kąt fi wyrażony w radianach
-R = [cos(fi) -sin(fi); sin(fi) cos(fi)];  
-end
 function d2q = Uklad(Czlony,dCzlony, ParyObrotowe, ParyPostepowe, WymPost, Masy,Sprezyto_tlumiace,Sily)
 alfa_bombardier=10;
 beta_bombardier=10;
@@ -581,34 +577,8 @@ for i = 1:(size(ParyPostepowe,1))
     indeks_macierz = indeks_macierz + 2;
 end
 
-% % wymuszenia postepowe
-% for ii = 1:(size(WymPostepowe,1))
-%     i=WymPostepowe(ii,1);
-%     if ParyPostepowe(i,1)~=0
-%         ri=Q(3*ParyPostepowe(i,1)-2:3*ParyPostepowe(i,1)-1);
-%         Roti=Rot(Q(3*ParyPostepowe(i,1)));
-%     else
-%         ri=[0;0];
-%         Roti=Rot(0);
-%     end
-%     if ParyPostepowe(i,2)~=0
-%         rj=Q(3*ParyPostepowe(i,2)-2:3*ParyPostepowe(i,2)-1);
-%         Rotj=Rot(Q(3*ParyPostepowe(i,2)));
-%     else
-%         rj=[0;0];
-%         Rotj=Rot(0);
-%     end
-% 
-%     % wzor 2.28 na wymuszenie w parze postepowej
-%     F(indeks_macierz,1) = (Rotj * ParyPostepowe(i,4:5)')'*(rj + Rotj * ParyPostepowe(i,8:9)' - ri - Roti * ParyPostepowe(i,6:7)') - Fab(i,czas,ParyPostepowe, WymPostepowe);
-% 
-%     indeks_macierz = indeks_macierz + 1;
-% end
-
 end
 function x = Fab(id_wiezu, t,ParyPostepowe, WymPostepowe)
-% wektorowa funkcja czasu
-%lk=sqrt((ParyPostepowe(id_wiezu,10)-ParyPostepowe(id_wiezu,12))^2+(ParyPostepowe(id_wiezu,11)-ParyPostepowe(id_wiezu,13))^2);
 A=WymPostepowe(id_wiezu,2);
 omega=WymPostepowe(id_wiezu,3);
 fi=WymPostepowe(id_wiezu,4);
