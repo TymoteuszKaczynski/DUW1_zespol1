@@ -1,17 +1,19 @@
 
 %START.m
 fprintf('Krok czasowy:\n')
-dT = 0.1; %input("Wpisz dt:\n");
+dT = 0.01; %input("Wpisz dt:\n");
 fprintf('Czas symulacji [s]:\n')
-T_Max = 30; %input("Wpisz t maksymalne:\n")
+T_Max = 5; %input("Wpisz t maksymalne:\n")
 
 [Q, DQ, D2Q] = main(dT,T_Max);
+plotD2Qcm(5,0.01,D2Q,10,"fi")
+saveas(gcf,'Wyniki/Dynamika/d2q_10_fi.png')
 
 
 function [Q,dQ,d2Q]=main(dT,T_Max)
 czas = 0:dT:T_Max;
 
-[Czlony, ParyObrotowe, ParyPostepowe, WymPost, Masy, Sily, Sprezyto_tlumiace] = WczytajDane();
+[Czlony, ParyObrotowe, ParyPostepowe, WymPost, Masy, Sily, Sprezyto_tlumiace] = Dane();
 
 Y0=[Czlony,Czlony*0];
 OPTIONS = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
@@ -250,26 +252,6 @@ end
 FQ = MacierzJacobiego(Q, ParyObrotowe, ParyPostepowe, WymPostepowe);
 d2Q = FQ \ gamma;
 end
-function [q] = PunktPolozenie(Q,nr_czlonu,S_A)
-q=Q(3*nr_czlonu-2:3*nr_czlonu-1,:);
-for i=1:length(q)
-    q(:,i)=q(:,i)+Rot(Q(3*nr_czlonu,i))*S_A;
-end
-end
-function [dq] = PunktPredkosc(Q,dQ,nr_czlonu,S_A)
-omega = [0 -1; 1 0];
-dq=dQ(3*nr_czlonu-2:3*nr_czlonu-1,:);
-for i=1:length(dq)
-    dq(:,i)=dq(:,i)+(omega*Rot(Q(3*nr_czlonu,i))*S_A*dQ(3*nr_czlonu,i));
-end
-end
-function [dq] = PunktPrzyspieszenie(Q,dQ,d2Q,nr_czlonu,S_A)
-omega = [0 -1; 1 0];
-dq=d2Q(3*nr_czlonu-2:3*nr_czlonu-1,:);
-for i=1:length(dq)
-    dq(:,i)=dq(:,i)+(omega*Rot(Q(3*nr_czlonu,i))*S_A*d2Q(3*nr_czlonu,i))-(Rot(Q(3*nr_czlonu,i))*S_A*dQ(3*nr_czlonu,i)^2);
-end
-end
 function d2q = Uklad(Czlony,dCzlony, ParyObrotowe, ParyPostepowe, WymPost, Masy,Sprezyto_tlumiace,Sily)
 alfa_bombardier=10;
 beta_bombardier=10;
@@ -284,10 +266,6 @@ b=[Q;wekt_gamma-2*alfa_bombardier*Jakobi*dCzlony-beta_bombardier^2*Wiezy(Czlony,
 x=A\b;
 d2q=x(size(x,1)/2+1:size(x,1));
 end
-% function [ret] = Uklad_ode(t,Y, ParyObrotowe, ParyPostepowe, WymPost, Masy,Sprezyto_tlumiace,Sily)
-% d2Q=Uklad(Y(1:size(Masy,1)),Y(size(Masy,1)+1:size(Y,1)), ParyObrotowe, ParyPostepowe, WymPost, Masy,Sprezyto_tlumiace,Sily);
-% ret=[Y(size(Masy,1)+1:size(Y,1));d2Q];
-% end
 function [ret] = Uklad_ode(t,Y, ParyObrotowe, ParyPostepowe, WymPost, Masy,Sprezyto_tlumiace,Sily)
 alfa_bombardier=10;
 beta_bombardier=10;
@@ -302,7 +280,7 @@ b=[Q;wekt_gamma-2*alfa_bombardier*Jakobi*Y(size(Masy,1)+1:size(Y,1))-beta_bombar
 x=A\b;
 ret=[Y(size(Masy,1)+1:size(Y,1));x(1:size(Masy,1))];
 end
-function [Czlony, ParyObrotowe, ParyPostepowe, WymPost, Masy, Sily, Sprezyto_tlumiace] = WczytajDane()
+function [Czlony, ParyObrotowe, ParyPostepowe, WymPost, Masy, Sily, Sprezyto_tlumiace] = Dane()
 %     Otwarcie plików
 plik_czlony = fopen('Dane/Człony.txt', 'r');
 plik_pary = fopen('Dane/Pary.txt', 'r');
